@@ -734,7 +734,9 @@ classdef PETsystem
 
         end%function cal_senimg_uih  
         
-        function senimg = cal_senimg_TESTING(obj, plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, blockringdiff, num_blockrings, num_bins_axial_reduced)  
+        function senimg = cal_senimg_single_bed(obj, plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, num_blockrings, num_bins_axial_reduced, bedStartRing, bedEndRing)
+            %   bedStartRing: ring number of the start of the bed position (from 1 to 672)
+            %   bedEndRing: ring number of end  of bed
             senimg = 0;
 
             % calculated inverted crystal efficiencies and plane efficiencies
@@ -773,19 +775,7 @@ classdef PETsystem
             
             num_crystals = crystal_array * num_blocks;                              % 840
             
-            nocrypairs = zeros(num_crystals, num_crystals, 'uint32');
-            
-            
-            
-            for m=1:num_bins_sino       %% PROBABLY NEVER NEEDED!
-                
-                nv = sino_xpairs(1, m);
-                nu = sino_xpairs(2, m);
-                
-                nocrypairs(nv, nu) = m;
-                nocrypairs(nu, nv) = m;
-                
-            end            
+            nocrypairs = zeros(num_crystals, num_crystals, 'uint32');         
 
             
             num_gaps = num_blockrings - 1;                                          % 7
@@ -835,16 +825,15 @@ classdef PETsystem
             
             num_bins_angular_reduced = crystal_array;       % 35
             
-            temp_nring = 1;
-            for n = 1 : temp_nring % nring_wogap 
+            for n = bedStartRing : bedEndRing % nring_wogap 
                 
                 fprintf('processing ring without gap   #%d ...\n', n);
 
 
-                if (  ( ( ceil(nring - m0(n))/num_xtals_wgap ) >= blockringdiff) ||  ( ( ceil(m0(n))/num_xtals_wgap ) >= blockringdiff ) )
+                %if (  ( ( ceil(nring - m0(n))/num_xtals_wgap ) >= blockringdiff) ||  ( ( ceil(m0(n))/num_xtals_wgap ) >= blockringdiff ) )
                 
                     lmdata(2,:) = int16(m0(n)); % fill 2nd row of lmdata with current crystal ring: m0(1) = 0, m0(2) = 1, etc
-                    
+                %{    
                     noblockring1 = floor(single(lmdata(2,:))/num_xtals_wgap);   %fill array noblockring1 with current unit from 0 to 7
                     noblockring2 = floor(single(lmdata(4,:))/num_xtals_wgap);   %fill array noblockring2 with unit of all rings
 
@@ -857,8 +846,14 @@ classdef PETsystem
                     idx2 = find(noblcokringdifference == blockringdiff);    % get ALL positions in array noblcokringdifference with correct unit difference (i.e. equals blockringdiff) 
                                                                             % and write them to array indx2
 
-
-                    lm0 = lmdata(:, idx2);  %saves every column of lmdata with matching unit difference and saves it to lm0.
+                %}
+                    lm0 = [];
+                    for r = bedStartRing : bedEndRing
+                        a = (r-1)*size(sino_xpairs,2)+1;
+                        b = (r)*size(sino_xpairs,2);
+                        lm0 = [lm0, lmdata(:,[a:b])];
+                    end
+                    %lm0 = lmdata(:, idx2);  %saves every column of lmdata with matching unit difference and saves it to lm0.
 
 
                     linearInd_1 = sub2ind(size(cryseff_wgap), uint32(lm0(2,:)+1), uint32(lm0(1,:)+1) );
@@ -896,7 +891,7 @@ classdef PETsystem
                     clear lm_nrm  prjs_att  ratio_MC_Ana  lm0 s0
                                   
                     
-                end
+                %end
 
         %}   
             end% for loop

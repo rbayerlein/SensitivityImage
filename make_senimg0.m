@@ -1,9 +1,14 @@
-function make_senimg0(senimg_name, att_image_name, cryseff_name, plaeff_name)
+function make_senimg0(senimg_name, att_image_name, cryseff_name, plaeff_name, bedStartRing, bedEndRing)
 
-blockringdiff_no = 0
+%bedStartRing = 1   % 1 : 672
+%bedEndRing = 80    % bedStartRing+1 : 672
+
+if (bedStartRing < 1 || bedStartRing > 672 || bedEndRing < bedStartRing || bedEndRing > 672)
+    disp('Invalid ring numbers. Cannot define bed position.');
+end
 
 senimg_name = senimg_name(1:strfind(senimg_name, '.sen_img')); 
-senimg_name = [senimg_name, num2str(blockringdiff_no),'.sen_img']; 
+senimg_name = [senimg_name, num2str(bedStartRing), '_', num2str(bedEndRing), '.sen_img']; 
 
 senimg_name
 att_image_name
@@ -46,9 +51,6 @@ att_image_size = [str2double(size_str(1:(ind_x1(1)-1))) str2double(size_str((ind
 
 att_voxel_size = [str2double(vox_str(1:(ind_x2(1)-1))) str2double(vox_str((ind_x2(1)+1):(ind_x2(2)-1))) str2double(vox_str((ind_x2(2)+1):end))]
 
-
-
-
 fid_cryseff = fopen(cryseff_name, 'rb'); 
 cryseff_wgap = fread(fid_cryseff, inf, 'float'); 
 cryseff_wgap = reshape(cryseff_wgap, 679, 840); 
@@ -60,36 +62,19 @@ plaeff_wgap = reshape(plaeff_wgap, 679, 679);
 fclose(fid_plaeff); 
 
 
-
-
-
 padd=genpath('./PETsystem');
 addpath(padd);
 
 scanner=buildPET('explorer2000mm_unitedimaging');
 obj = scanner;
 
-% num_bins_radial = 549;
 num_bins_axial_reduced = 84;
-% num_bins_angualr_reduced = 35;
-blockringdiff = 4;   
-
 
 num_blockrings = 8;
 num_gap = 7;
 num_axialxtals = 672;
 num_transxtals = 840;
 num_axialxtals_wgap = num_axialxtals+num_gap;
-
-
-%fname_plaeff_wgap = './plane_efficiency_679x679_float.NC'
-%plaeff_wgap = fread(fopen(fname_plaeff_wgap, 'rb'), inf, 'float'); 
-%plaeff_wgap = reshape(plaeff_wgap, num_axialxtals_wgap, num_axialxtals_wgap);
-
-%fname_cryseff_wgap = './crystal_efficiency_679_840_float.NC'
-%cryseff_wgap = fread(fopen(fname_cryseff_wgap, 'rb'), inf, 'float'); 
-%cryseff_wgap = reshape(cryseff_wgap, num_axialxtals_wgap, num_transxtals);
-
 
 
 fprintf('calculate the sensitivity image:\n');
@@ -100,24 +85,15 @@ numslices_attn = 828; %672;
 numpix_attn = size(att_image, 1); 
 numslices_attn = size(att_image, 3); 
 
-%fprintf('fread attmap data:\n');
-%fname_mumap = './ct_ac.img'
-%att_image = fread(fopen(fname_mumap, 'rb'), inf, 'float'); 
-%att_image = reshape(att_image, numpix_attn, numpix_attn, numslices_attn);
-%att_image = att_image(end:-1:1, :, :);
-
-%bp1 = zeros(num_voxels, num_voxels, num_slices);
-
-
 %bp = scanner.cal_senimg_uih(plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, blockringdiff_no, num_blockrings, num_bins_axial_reduced);  
 
-bp = scanner.cal_senimg_TESTING(plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, blockringdiff_no, num_blockrings, num_bins_axial_reduced);
+bp = scanner.cal_senimg_single_bed(plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, num_blockrings, num_bins_axial_reduced, bedStartRing, bedEndRing);
 fwrite(fopen(senimg_name, 'w'), bp, 'single');
 fclose('all');
 
 
 
-ss = ['done ring diff = ', num2str(blockringdiff_no)]; 
+ss = ['done bed position with rings ', num2str(bedStartRing), ' to ', num2str(bedEndRing)]; 
 disp(ss); 
 
 %% display sens img
