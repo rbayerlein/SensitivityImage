@@ -91,8 +91,6 @@ bp = scanner.cal_senimg_single_bed(plaeff_wgap, cryseff_wgap, att_image, att_ima
 fwrite(fopen(senimg_name, 'w'), bp, 'single');
 fclose('all');
 
-
-
 ss = ['done bed position with rings ', num2str(bedStartRing), ' to ', num2str(bedEndRing)]; 
 disp(ss); 
 
@@ -105,6 +103,8 @@ dim_z = 679;
 slice = reshape(bp(:,round(dim_y/2),:), [dim_x, dim_z]);
 imshow(slice, []);
 colorbar;
+pause(5.0); %wait so that user can quickly look at sensitivity map before continuing.
+
 
 
 
