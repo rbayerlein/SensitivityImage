@@ -9,9 +9,16 @@ sen_img = sen_img(:);
 
 overlap = overlap_percent/100
 
+lastBedEndRing = bedStartRing + (1+ (num_beds-1)*(1-overlap))*rings_per_bed-1
+
+slice_weighting = zeros(dim_z,1);
+
 for r = 1 : num_beds
     start = bedStartRing + (r-1)*(1-overlap)*rings_per_bed
     finish = start + rings_per_bed-1
+    for s = start : finish
+        slice_weighting(s,1) = slice_weighting(s,1)+1;
+    end
     senimg_name_temp = senimg_name(1:strfind(senimg_name, '.sen_img')); 
     senimg_name_temp = [senimg_name_temp, num2str(start), '_', num2str(finish), '.sen_img'];
     ss = ['now reading in ', senimg_name_temp];
@@ -23,14 +30,21 @@ for r = 1 : num_beds
     fclose(fid);
 end
 
+sen_img = reshape(sen_img, dim_x, dim_y, dim_z);
+for s = bedStartRing : lastBedEndRing
+    if slice_weighting(s,1) ~= 0
+        sen_img(:,:,s) = sen_img(:,:,s)/slice_weighting(s,1);
+    end
+end
+
 out_name = senimg_name(1:strfind(senimg_name, '.sen_img'));
-out_name = [out_name, 'combine_', num2str(num_beds), 'beds_', num2str(rings_per_bed), 'rings_from', num2str(bedStartRing), '_', num2str(overlap_percent), '%overlap', '.sen_img'];
+out_name = [out_name, 'combine_weighted_', num2str(num_beds), 'beds_', num2str(rings_per_bed), 'rings_from', num2str(bedStartRing), '_', num2str(overlap_percent), '%overlap', '.sen_img'];
 
 ss=['output file name ' , out_name]
 disp(ss);
 
 
-sen_img = reshape(sen_img, 239, 239, 679);
+
 slice = reshape(sen_img(:,round(239/2),:), [239, 679]);
 imshow(slice, []);
 colorbar;
@@ -48,7 +62,6 @@ final_ring = final_ring + num_gaps_end
 if rem(final_ring-num_gaps_end,84) == 0
     final_ring = final_ring-1
 end
-
 
 highVal = realmax('single')
 
