@@ -4,8 +4,8 @@ function make_senimg0(nc_file, senimg_name, att_image_name, cryseff_name, plaeff
 %bedEndRing = 80    % first_bed_ring+1 : 672
 overlap = overlap_percent/100;
 
-plane_eff_672_672 = get_plaeff(nc_file, num_beds, first_bed_ring, rings_per_bed, overlap);
-crys_eff_840_672 = get_cryseff(nc_file);
+plane_eff_672x672 = get_plaeff(nc_file, num_beds, first_bed_ring, rings_per_bed, overlap);
+crys_eff_840x672 = get_cryseff(nc_file);
 [crys_eff_840x679, plane_eff_679x679] = add_axial_gap(crys_eff_840x672, plane_eff_672x672); 
 
 fid_cryseff = fopen(cryseff_name, 'wb');
@@ -17,7 +17,7 @@ fwrite(fid_plaeff, plane_eff_679x679, 'float');
 fclose(fid_plaeff);
 
 senimg_name = senimg_name(1:strfind(senimg_name, '.sen_img'));
-senimg_name = [senimg_name, num2str(num_beds), 'beds_', num2str(rings_per_bed), 'rings_from', num2str(first_bed_ring), '_', num2str(overlap), '%overlap', '.sen_img']
+senimg_name = [senimg_name, num2str(num_beds), 'beds_', num2str(rings_per_bed), 'rings_from', num2str(first_bed_ring), '_', num2str(overlap_percent), '%overlap_MUD', num2str(blockringdiff_no), '.sen_img']
 
 senimg_name
 att_image_name
@@ -71,7 +71,7 @@ plaeff_wgap = reshape(plaeff_wgap, 679, 679);
 fclose(fid_plaeff); 
 
 
-padd=genpath('./PETsystem');
+padd=genpath('/home/rbayerlein/Code/Recon/senimg/PETsystem');
 addpath(padd);
 
 scanner=buildPET('explorer2000mm_unitedimaging');
@@ -100,7 +100,7 @@ bp = scanner.cal_senimg_uih(plaeff_wgap, cryseff_wgap, att_image, att_image_size
 fwrite(fopen(senimg_name, 'w'), bp, 'single');
 fclose('all');
 
-ss = ['done bed position with rings ', num2str(first_bed_ring), ' to ', num2str(bedEndRing)]; 
+ss = ['done bed position with MUD ', num2str(blockringdiff_no)]; 
 disp(ss); 
 
 %% display sens img

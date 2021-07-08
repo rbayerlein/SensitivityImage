@@ -67,11 +67,12 @@ for pos = 1 : num_beds
 end
 
  %% invert the plane efficiencies back
- 
+
+ lowest_value = 0;
 for ax = 1 : num_crys_ax
     for trans = 1 : num_crys_ax
         if plane_eff_temp(ax, trans) == 0
-            plane_eff_temp(ax, trans) = 1;
+            plane_eff_temp(ax, trans) = lowest_value;
         end
         plane_eff(ax, trans) = 1/plane_eff_temp(ax, trans);
     end
