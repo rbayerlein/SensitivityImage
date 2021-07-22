@@ -46,6 +46,7 @@ final_ring = bedStartRing + rings_per_bed + (1-overlap)*rings_per_bed*(num_beds-
 num_gaps_end = fix(final_ring/84)
 final_ring = final_ring + num_gaps_end
 if rem(final_ring-num_gaps_end,84) == 0
+    disp('adjusting last ring of last bed');
     final_ring = final_ring-1
 end
 

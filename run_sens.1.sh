@@ -3,14 +3,14 @@
 # usage: define start and end ring number of each bed position starting from 1 as the smallest start position and 679 as the largest ring number
 # for combining all to one sensitivity image, define start ring, rings per bed and number of overlapping beds
 
-P1=\'/media/rbayerlein/data/recon_data/Blank_scan/CTAC_201.BLANK.sen_img\'		#output name of the final combined sensitivity image
-#P2=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img\' #CT image
-P2=\'/media/rbayerlein/data/recon_data/Blank_scan/CTAC_201_mumap_ZEROS_size-256x256x646_vox-2.7344x2.7344x3.img\'
-P3=\'/media/rbayerlein/data/recon_data/Blank_scan/crys_eff_679x840\'		#crys eff map WITH gaps. file ACTUALLY needs to be at that location
-P4=\'/media/rbayerlein/data/recon_data/Blank_scan/plane_eff_679x679\'		#plane eff map WITH gaps. file ACTUALLY needs to be at that location
+P1=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201.sen_img\'		#output name of the final combined sensitivity image
+P2=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img\' #CT image
+#P2=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_ZEROS_size-256x256x646_vox-2.7344x2.7344x3.img\'
+P3=\'/media/rbayerlein/data/recon_data/20200124/sen_img/crys_eff_679x840\'		#crys eff map WITH gaps. file ACTUALLY needs to be at that location
+P4=\'/media/rbayerlein/data/recon_data/20200124/sen_img/plane_eff_679x679\'		#plane eff map WITH gaps. file ACTUALLY needs to be at that location
 
-num_beds=7
-rings_per_bed=60
+num_beds=5
+rings_per_bed=224
 bedStartRing=1
 overlap=50	# in percent
 

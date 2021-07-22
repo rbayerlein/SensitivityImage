@@ -756,10 +756,6 @@ classdef PETsystem
             
             sino_xpairs = int16(obj.getDefaultSinogramCrystalPairs);    %2x230580 matrix (rows x columns)
             %  size(sino_xpairs);
-            sino_xpairs(1,1)
-            sino_xpairs(2,1)
-            sino_xpairs(2,1)
-            sino_xpairs(2,2)
 
             
             nrad = obj.system_parms.number_of_projections_per_angle;
@@ -944,11 +940,6 @@ classdef PETsystem
             
             sino_xpairs = int16(obj.getDefaultSinogramCrystalPairs);    %2x230580 matrix (rows x columns)
             %  size(sino_xpairs);
-            sino_xpairs(1,1)
-            sino_xpairs(2,1)
-            sino_xpairs(2,1)
-            sino_xpairs(2,2)
-
             
             nrad = obj.system_parms.number_of_projections_per_angle;
             nang = obj.getDefaultNumberOfAngles;
