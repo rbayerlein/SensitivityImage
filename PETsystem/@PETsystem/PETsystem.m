@@ -253,23 +253,23 @@ classdef PETsystem
                 end
             else
                 
-                id0 = fix(nxtal_trans / 2);
+                id0 = fix(nxtal_trans / 2); % fix(35/2) = 17
                 odd = mod(nxtal_trans, 2) ~= 0;
                 
                 if odd
-                    id1 = fix(xtal_num_trans_total / 2) + fix(nxtal_trans / 2);
-                    nr = fix(num_of_angles / 2) * 2 - 1;
+                    id1 = fix(xtal_num_trans_total / 2) + fix(nxtal_trans / 2); % 420+17 = 437
+                    nr = fix(num_of_angles / 2) * 2 - 1; % 419
                 else
                     id1 = fix(xtal_num_trans_total / 2) + fix(nxtal_trans / 2) - 1;
                     nr = fix(num_of_angles / 2) * 2;
                 end
                 
-                h0 = zeros(nr,1);
+                h0 = zeros(nr,1);   % 419 lines, 1 column
                 h1 = zeros(nr,1);
                 
-                for i=0:nr-1
+                for i=0:nr-1    % loop over all 419 angles and define pairs between opposite crystals h0 and h1
                     if odd
-                        id = id0 + fix(nr/2) - i;
+                        id = id0 + fix(nr/2) - i; % 17  + fix(419/2) -i = 226 - i
                     else
                         id = id0 + fix(nr/2) -1 - i;
                     end
@@ -280,7 +280,7 @@ classdef PETsystem
                     
                     h0(i+1) = id;
                     if odd
-                        id = id1 - fix(nr/2) + i;
+                        id = id1 - fix(nr/2) + i; % 437 - fix(419/2) + i = 228 + i
                     else
                         id = id1 - fix(nr/2) + 1 + i;
                     end
@@ -290,7 +290,7 @@ classdef PETsystem
             
             % pairing
             c = 1; k = 1;
-            while c < length(h0)
+            while c < length(h0) % c < 419
                 xtal_id1 = h0(c);
                 xtal_id2 = h1(c);
                 xp_first_angle(:,k) = [xtal_id1; xtal_id2];
@@ -495,7 +495,7 @@ classdef PETsystem
 
 
 
-        function senimg = cal_senimg_uih(obj, plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, blockringdiff, num_blockrings, num_bins_axial_reduced)  
+        function senimg = cal_senimg_uih(obj, plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, blockringdiff, num_blockrings, num_bins_axial_reduced, first_bed_ring, last_bed_ring)  
         
         	cryseff_wgap_inv = 1 ./ cryseff_wgap; 
         	plaeff_wgap_inv = 1 ./ plaeff_wgap; 
@@ -605,7 +605,8 @@ classdef PETsystem
             num_bins_angular_reduced = crystal_array;
             
             
-            for n = 1: nring_wogap %  589  %      1 : nring_wogap
+            %for n = 1: nring_wogap %  589  %      1 : nring_wogap
+            for n = first_bed_ring : last_bed_ring %  589  %      1 : nring_wogap
                 
                 fprintf('processing ring without gap   #%d ...\n', n);
 
@@ -738,6 +739,9 @@ classdef PETsystem
             %   bedStartRing: ring number of the start of the bed position (from 1 to 672)
             %   bedEndRing: ring number of end  of bed
             senimg = 0;
+            
+            bedStartRing
+            bedEndRing
 
             % calculated inverted crystal efficiencies and plane efficiencies
             cryseff_wgap_inv = 1 ./ cryseff_wgap;
@@ -748,7 +752,7 @@ classdef PETsystem
             cryseff_wgap = cryseff_wgap_inv; 
             plaeff_wgap = plaeff_wgap_inv; 
             
-            nring = obj.getNumberOfCrystalRings();  %679, includes gaps
+            nring = obj.getNumberOfCrystalRings()  %679, includes gaps
             
             tc = obj.getCrystalTransaxialLocations();
             to = obj.getCrystalRingOffsets();
@@ -761,22 +765,22 @@ classdef PETsystem
             nrad = obj.system_parms.number_of_projections_per_angle;
             nang = obj.getDefaultNumberOfAngles;
             
-            num_bins_radial = nrad;     %549
-            num_bins_angular = nang;    %420
+            num_bins_radial = nrad     %549
+            num_bins_angular = nang    %420
             
-            num_bins_sino = num_bins_radial * num_bins_angular;                     % 230580
+            num_bins_sino = num_bins_radial * num_bins_angular                     % 230580
             
-            crystal_array = obj.system_parms.crystal_array_size(1);                 % 35
-            num_blocks = obj.system_parms.number_of_detector_modules_transaxial;    % 24
+            crystal_array = obj.system_parms.crystal_array_size(1)                 % 35
+            num_blocks = obj.system_parms.number_of_detector_modules_transaxial    % 24
             
-            num_crystals = crystal_array * num_blocks;                              % 840
+            num_crystals = crystal_array * num_blocks                              % 840
             
             nocrypairs = zeros(num_crystals, num_crystals, 'uint32');         
 
             
-            num_gaps = num_blockrings - 1;                                          % 7
+            num_gaps = num_blockrings - 1                                          % 7
             
-            nring_wogap = nring - num_gaps;                                         % 672
+            nring_wogap = nring - num_gaps                                     % 672
 
 
             

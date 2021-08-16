@@ -33,3 +33,6 @@
 
 # Folders
 /dir_temp
+
+# other stuff I don't know
+*.asv

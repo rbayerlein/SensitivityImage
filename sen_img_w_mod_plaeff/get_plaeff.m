@@ -1,14 +1,14 @@
 function plane_eff = get_plaeff(nc_path, num_beds, first_bed_ring, rings_per_bed, overlap);
 
 num_crys_ax = 672; 
-last_ring = first_bed_ring+rings_per_bed+(num_beds-1)*(1-overlap)*rings_per_bed -1
+last_ring = first_bed_ring+rings_per_bed+(num_beds-1)*(rings_per_bed-overlap) -1
 if last_ring > num_crys_ax
-    disp('Number of beds exceeds total length of EXPLORER field of view!')
+    disp('Number of beds exceeds total length of EXPLORER field of view. Abort.')
     return;
 end
 
-if (overlap < 0 || overlap > 1)
-    disp('overlap is not between 0 and 1. Abort.')
+if (overlap < 0 || overlap > rings_per_bed-1)
+    disp('Bed overlap is not valid. Abort.')
     return;
 end
 
@@ -49,11 +49,27 @@ for k = 1:num_crys_ax
 	end
 end
 
+%% calculate the average of the ORIGINAL inverted plane efficiency
+
+average = 0;
+count =0;
+for x = 1 :num_crys_ax
+    for y = 1:num_crys_ax
+        if plane_eff(x,y) <10e30 && plane_eff(x,y) ~= 0 && plane_eff(x,y) ~=1
+            average = average + plane_eff(x,y);
+            count = count + 1;
+        end
+    end
+end
+average = average/count;
+ss = ['average of ORIGINAL inverted plane efficiency map: ', num2str(average)];
+disp(ss);
+
 %% add plane efficiencies from individual bed positions
 plane_eff_temp = zeros(num_crys_ax,num_crys_ax); 
 
 for pos = 1 : num_beds
-    startRing = first_bed_ring + (pos-1)*rings_per_bed*(1-overlap);
+    startRing = first_bed_ring + (pos-1)*(rings_per_bed-overlap);
     endRing = startRing + rings_per_bed - 1;
     for ax = 1 : num_crys_ax
         if (ax >=startRing && ax <=endRing)
@@ -64,6 +80,35 @@ for pos = 1 : num_beds
             end
         end
     end            
+end
+
+%% calculate the average of the MODIFIED inverted plane efficiency
+
+average_mod = 0;
+count_mod =0;
+for x = 1 :num_crys_ax
+    for y = 1:num_crys_ax
+        if plane_eff_temp(x,y) <10e30 && plane_eff_temp(x,y) ~= 0 && plane_eff_temp(x,y) ~=1
+            average_mod = average_mod + plane_eff_temp(x,y);
+            count_mod = count_mod + 1;
+        end
+    end
+end
+average_mod = average_mod/count_mod;
+ss = ['average of MODIFIED inverted plane efficiency map: ', num2str(average_mod)];
+disp(ss);
+
+%% Calculate and apply scaling factor
+scaling_factor = average/average_mod;
+ss = ['scaling factor: ', num2str(scaling_factor)];
+disp(ss);
+
+for i = 1:num_crys_ax
+    for j = 1:num_crys_ax
+        if plane_eff_temp(i,j) < 10e30 && plane_eff_temp(i,j) ~=0 && plane_eff_temp(i,j) ~=1
+            plane_eff_temp(i,j) = plane_eff_temp(i,j)*scaling_factor;
+        end
+    end
 end
 
  %% invert the plane efficiencies back

@@ -2,10 +2,10 @@
 # rbayerlein August 2021
 # script to invoke the sensitivity image creation process for all MUDs until MUD_max which is calculated from the parameter rings_per_bed.
 
-num_beds=8
-rings_per_bed=78
-bedStartRing=40
-overlap=39	# in number of rings
+num_beds=14
+rings_per_bed=84
+bedStartRing=20
+overlap=42	# in number of rings
 MUD_max=4
 
 # calculate MUD_max
@@ -25,11 +25,12 @@ fi
 
 ###########################
 
-NC=\'/media/rbayerlein/SSD_09_Reimund/20210714/BLACKMER_DAPHNE_7726605_102448/PET/RawData/1.2.156.112605.159303471608576.210714172449.9.6428.124756/1.2.156.112605.159303471608576.210714173209.9.13352.11455.1.nc\'
-P1=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/CTAC_90_min_201.sen_img\'		#output RAW file name of the final combined sensitivity image
-P2=\'/media/rbayerlein/SSD_09_Reimund/20210714/BLACKMER_DAPHNE_7726605_102448/Image/CTAC_90_MIN_201\' # Path to CT image
-#/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img
+NC=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/cylinder.1.nc\'
+P1=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/CTAC_201.sen_img\'		#output name of the final combined sensitivity image
+P2=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img\' #CT image
 #P2=\'/media/rbayerlein/data/recon_data/Blank_scan/CTAC_201_mumap_ZEROS_size-256x256x646_vox-2.7344x2.7344x3.img\'
+P3=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/crys_eff_679x840\'		#crys eff map WITH gaps, file WILL BE CREATED at that location
+P4=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/plane_eff_679x679\'		#plane eff map WITH gaps, file WILL BE CREATED at that location
 
 ###########################
 
@@ -51,9 +52,8 @@ fi
 
 for ((i = 0 ; i <= ${MUD_max} ; i++))
 do
-	./run_sens.sh ${i} ${num_beds} ${rings_per_bed} ${bedStartRing} ${overlap} ${NC} ${P1} ${P2} &
+	./run_sens_cylinder.sh ${i} ${num_beds} ${rings_per_bed} ${bedStartRing} ${overlap} ${NC} ${P1} ${P2} ${P3} ${P4} & 
 done
-wait
 
 #combine all bed positions
-matlab -nodesktop -r "combine_sen_img_mod_plane_eff(${P1}, ${num_beds}, ${rings_per_bed}, ${bedStartRing}, ${overlap}, ${MUD_max}); quit"
+matlab -nodesktop -r "combine_sen_img_mod_plane_eff(${P1}, ${num_beds}, ${rings_per_bed}, ${bedStartRing}, ${overlap}, 1); quit"
