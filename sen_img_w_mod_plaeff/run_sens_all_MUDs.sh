@@ -2,35 +2,45 @@
 # rbayerlein August 2021
 # script to invoke the sensitivity image creation process for all MUDs until MUD_max which is calculated from the parameter rings_per_bed.
 
-num_beds=8
-rings_per_bed=78
-bedStartRing=40
-overlap=39	# in number of rings
+num_beds=3
+rings_per_bed=3
+bedStartRing=1
+overlap=2	# in number of rings
 MUD_max=4
 
 # calculate MUD_max
-if [[ $rings_per_bed -gt 85 ]]; then
-	echo "bed positions could span over 3 units -> MUD_max = 2"
-	MUD_max=2
-elif [[ $rings_per_bed -gt 169 ]]; then
-	echo "bed positions could span over 4 units -> MUD_max = 3"
-	MUD_max=3
-elif [[ $rings_per_bed -gt 253 ]]; then
-	echo "bed positions could span over 4 units -> MUD_max = 4"
-	MUD_max=4
-else
+if [[ $rings_per_bed -lt 86 ]]; then
 	echo "bed positions could span over no more than 2 units -> MUD_max = 1"
 	MUD_max=1
+elif [[ $rings_per_bed -gt 85 ]] && [[ $rings_per_bed -lt 170 ]]; then
+	echo "bed positions could span over 3 units -> MUD_max = 2"
+	MUD_max=2
+elif [[ $rings_per_bed -gt 169 ]] && [[ $rings_per_bed -lt 254 ]]; then
+	echo "bed positions could span over 4 units -> MUD_max = 3"
+	MUD_max=3
+else
+	echo "bed positions could span over 4 units -> MUD_max = 4"
+	MUD_max=4
 fi
 
 ###########################
 
-NC=\'/media/rbayerlein/SSD_09_Reimund/20210714/BLACKMER_DAPHNE_7726605_102448/PET/RawData/1.2.156.112605.159303471608576.210714172449.9.6428.124756/1.2.156.112605.159303471608576.210714173209.9.13352.11455.1.nc\'
-P1=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/CTAC_90_min_201.sen_img\'		#output RAW file name of the final combined sensitivity image
-P2=\'/media/rbayerlein/SSD_09_Reimund/20210714/BLACKMER_DAPHNE_7726605_102448/Image/CTAC_90_MIN_201\' # Path to CT image
-#/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img
+#norm coeff:
+NC=\'/media/rbayerlein/SSD_09_Reimund/20210714/NERVO_ATILLIO_7696939_144717_Raw/PET/RawData/1.2.156.112605.18587648329783.200722224718.9.3544.123942/1.2.156.112605.18587648329783.200722225223.9.13440.12752.1.nc\'
+
+#output RAW file name of the final combined sensitivity image
+#P1=\'/media/rbayerlein/data/recon_data/20210714/NERVO_ATILLIO_7696939_144717_Raw/sen_img/CTAC_120_MIN_201.sen_img\'		#output RAW file name of the final combined sensitivity image
+P1=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/CTAC_120_MIN_201.sen_img\'
+
+# Path to CT image 
+#P2=\'/media/rbayerlein/SSD_09_Reimund/20210714/NERVO_ATILLIO_7696939_144717_Raw/Image/CTAC_120_MIN_201\'
+	
+# alternative: give path to mu map; if exists: set boolean 'mu_map_exists' to 1
+P2=\'/media/rbayerlein/data/recon_data/20210714/NERVO_ATILLIO_7696939_144717_Raw/sen_img/CTAC_120_MIN_201_mumap_kVp-140_size-256x256x828_vox-2.7344x2.7344x2.344.img\'
+#P2=\'/media/rbayerlein/data/recon_data/20200124/sen_img/CTAC_201_mumap_kVp-140_size-256x256x646_vox-2.7344x2.7344x3.img\' 
 #P2=\'/media/rbayerlein/data/recon_data/Blank_scan/CTAC_201_mumap_ZEROS_size-256x256x646_vox-2.7344x2.7344x3.img\'
 
+mu_map_exists=1
 ###########################
 
 #catch invalid overlap
@@ -51,7 +61,7 @@ fi
 
 for ((i = 0 ; i <= ${MUD_max} ; i++))
 do
-	./run_sens.sh ${i} ${num_beds} ${rings_per_bed} ${bedStartRing} ${overlap} ${NC} ${P1} ${P2} &
+	 sleep 1; ./run_sens.sh ${i} ${num_beds} ${rings_per_bed} ${bedStartRing} ${overlap} ${NC} ${P1} ${P2} ${mu_map_exists} &
 done
 wait
 

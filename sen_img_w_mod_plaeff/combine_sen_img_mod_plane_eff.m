@@ -20,6 +20,10 @@ for MUD = 0 : max_MUD
     sen_img_temp = fread(fid, inf, 'float');
     sen_img = sen_img + sen_img_temp;
     fclose(fid);
+    
+    %delete temp senimg
+    cmd = ['rm ', senimg_name_temp]
+    system(cmd);
 end
 
 %% display one slice of the image to double-check
