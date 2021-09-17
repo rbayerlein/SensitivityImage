@@ -123,8 +123,10 @@ for ax = 1 : num_crys_ax
     end
 end
 
-% imshow(plane_eff, [0, 2])
-% colorbar;
+ imshow(plane_eff, [0, 3])
+ xlabel('axA');
+ ylabel('axB');
+ colorbar;
 
  %% add axial gap
 %num_crys_ax_wgap = 679; 

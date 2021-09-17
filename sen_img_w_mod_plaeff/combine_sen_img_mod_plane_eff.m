@@ -22,8 +22,8 @@ for MUD = 0 : max_MUD
     fclose(fid);
     
     %delete temp senimg
-    cmd = ['rm ', senimg_name_temp]
-    system(cmd);
+    cmd = ['rm ', senimg_name_temp];
+%    system(cmd);
 end
 
 %% display one slice of the image to double-check

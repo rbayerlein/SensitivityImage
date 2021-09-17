@@ -46,6 +46,7 @@ is_simulation=false;
     if mu_map_exists
         disp('mu map exists.');
         att_image_name=att_image_path;
+        
         %extract image info from file name
         find_size=strfind(att_image_name, 'size-')+5;
         dim_x = str2num(att_image_name(find_size:find_size+2));
@@ -55,9 +56,19 @@ is_simulation=false;
         
         find_vox=strfind(att_image_name, 'vox-')+4;
         find_x = strfind(att_image_name(find_vox:length(att_image_name)), 'x');
+        
         vx = str2double(att_image_name(find_vox:find_vox+find_x(1)-2));
         vy = str2double(att_image_name(find_vox+find_x(1):find_vox+find_x(2)-2));
-        vz = str2double(att_image_name(find_vox+find_x(2):strfind(att_image_name, '.img')-1));
+        
+        str = att_image_name(find_vox+find_x(2):length(att_image_name));
+        for it = 1 : length(str)
+            if ~isValidSign(str(it))
+                found_NaN = it;
+                break
+            end
+        end
+        vz = str2double(str(1:found_NaN-1))
+        
         att_voxel_size = [vx,vy,vz]
         
         find_kvp=strfind(att_image_name, 'kVp-')+4;
@@ -144,5 +155,31 @@ function pos = find_last_slash(inputString)
 end
 
 
-
+function bool = isValidSign(inputString)
+    bool = false;
+    switch inputString
+        case '0'
+            bool = true;
+        case '1'
+            bool = true;
+        case '2'
+            bool = true;
+        case '3'   
+            bool = true;
+        case '4'
+            bool = true;
+        case '5'
+            bool = true;
+        case '6'
+            bool = true;
+        case '7'   
+            bool = true;
+        case '8'
+            bool = true;
+        case '9'
+            bool = true;
+        case '.'
+            bool = true;
+    end
+end
 
