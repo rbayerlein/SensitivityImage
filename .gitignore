@@ -32,7 +32,8 @@
 *.app
 
 # Folders
-/dir_temp
+dir_temp
+sen_img_w_mod_plaeff/dir_temp/
 
 # other stuff I don't know
 *.asv

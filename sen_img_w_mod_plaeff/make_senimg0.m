@@ -2,19 +2,23 @@ function make_senimg0(nc_file, senimg_name, att_image_path, first_bed_ring, num_
 
 %=======================================================================
 % ONLY FOR SIMULATION !!
-is_simulation=false;
+is_simulation=true;
 %=======================================================================
 
-    nc_file
+    
     senimg_name
     att_image_path
     mu_map_exists = logical(mu_map_exists)
     
     %% get plane and cristal efficiency and save them to sen_img output folder
-    plane_eff_672x672 = get_plaeff(nc_file, num_beds, first_bed_ring, rings_per_bed, overlap);
-    crys_eff_840x672 = get_cryseff(nc_file);
+
     if is_simulation % overwrite crys_eff map with ones
         crys_eff_840x672 = ones(672,840);
+        plane_eff_672x672 = ones(672, 672);
+    else
+        disp(nc_file);
+        plane_eff_672x672 = get_plaeff(nc_file, num_beds, first_bed_ring, rings_per_bed, overlap);
+        crys_eff_840x672 = get_cryseff(nc_file);
     end
     [crys_eff_840x679, plane_eff_679x679] = add_axial_gap(crys_eff_840x672, plane_eff_672x672); 
 

@@ -738,10 +738,7 @@ classdef PETsystem
         function senimg = cal_senimg_single_bed(obj, plaeff_wgap, cryseff_wgap, att_image, att_image_size, att_voxel_size, image_size, voxel_size, num_blockrings, num_bins_axial_reduced, bedStartRing, bedEndRing)
             %   bedStartRing: ring number of the start of the bed position (from 1 to 672)
             %   bedEndRing: ring number of end  of bed
-            senimg = 0;
-            
-            bedStartRing
-            bedEndRing
+            senimg = 0;           
 
             % calculated inverted crystal efficiencies and plane efficiencies
             cryseff_wgap_inv = 1 ./ cryseff_wgap;
@@ -752,56 +749,31 @@ classdef PETsystem
             cryseff_wgap = cryseff_wgap_inv; 
             plaeff_wgap = plaeff_wgap_inv; 
             
-            nring = obj.getNumberOfCrystalRings()  %679, includes gaps
+            nring = obj.getNumberOfCrystalRings();  %679, includes gaps
             
             tc = obj.getCrystalTransaxialLocations();
             to = obj.getCrystalRingOffsets();
             
-            
             sino_xpairs = int16(obj.getDefaultSinogramCrystalPairs);    %2x230580 matrix (rows x columns)
-            %  size(sino_xpairs);
-
+            %  size(sino_xpairs);                        
             
-            nrad = obj.system_parms.number_of_projections_per_angle;
-            nang = obj.getDefaultNumberOfAngles;
-            
-            num_bins_radial = nrad     %549
-            num_bins_angular = nang    %420
-            
-            num_bins_sino = num_bins_radial * num_bins_angular                     % 230580
-            
-            crystal_array = obj.system_parms.crystal_array_size(1)                 % 35
-            num_blocks = obj.system_parms.number_of_detector_modules_transaxial    % 24
-            
-            num_crystals = crystal_array * num_blocks                              % 840
-            
-            nocrypairs = zeros(num_crystals, num_crystals, 'uint32');         
-
-            
-            num_gaps = num_blockrings - 1                                          % 7
-            
-            nring_wogap = nring - num_gaps                                     % 672
-
-
+            num_gaps = num_blockrings - 1;                                  % 7
+            nring_wogap = nring - num_gaps;                                 % 672
             
 %              fprintf('calculating pure geometrical sensitivity for maximum block ring difference = %d...\n',  max_blockringdiff);           
          %   fprintf('calculating pure geometrical sensitivity for block ring difference = %d...\n',  blockringdiff);
             fprintf('image size: %d x %d x %d, voxel size: %f x %f x %f (mm^3)\n',  image_size, voxel_size);            
             %   M = obj.system_parms.crystal_array_size(1) * obj.system_parms.number_of_detector_modules_transaxial;
 
-            
             i = int16(0);
-                        
-            
+                                    
             m0=[];
 
             % creates an array m0 with numbers from 0 to 678 but omitting the axial gaps, i.e. 84, 169, 254, 339, ...
             % int16(a : b) creates a list of integers (row vector) starting with a incrementing in steps of 1 and finishing with b as last entry
             for noblock=0:num_gaps
                 m0 = [m0, repmat(int16(noblock + noblock*num_bins_axial_reduced : noblock-1 + (noblock+1)*num_bins_axial_reduced ), 1, 1)]; %repmat() has no effect in this case
-            end
-            
-            
+            end      
             
             m=[];
             % creates an array with entries from 0 to 678 omitting gaps (like above) and does that for every sinogram bin (230580)
@@ -811,20 +783,15 @@ classdef PETsystem
                 m = [m, repmat(int16(noblock + noblock*num_bins_axial_reduced : noblock-1 + (noblock+1)*num_bins_axial_reduced ), size(sino_xpairs,2), 1)];
             end
             %whos
-            
-           
+
             lmdata = repmat(i, 5, size(sino_xpairs,2) * nring_wogap);   % array filled with value i at each position; has 5 rows, each with 230580 * 672 entries
             lmdata(1,:) = repmat(sino_xpairs(1,:)-1, 1, nring_wogap);   % decrement all elements in 1st row of sino_xpairs by 1, write row nring_wogap times in a row -> save in lmdata
             lmdata(3,:) = repmat(sino_xpairs(2,:)-1, 1, nring_wogap);   % decrement all elements in second row of sino_xpairs by 1, write row nring_wogap times in a row-> save 
             lmdata(4,:) = m(:); % 4th row of lmdata filled with elements in m, row by row, i.e. 230580 elements per row, 672 times:
                                 % 0, 0, 0, ..., 1, 1, 1, ..., 679, 679, 679, .... 679; each number appears 230580 times
 
-            
             num_xtals_wgap = num_bins_axial_reduced + 1;    % num_xtals_wgap = 84 +1 = 85;
-            
-            
-            num_bins_angular_reduced = crystal_array;       % 35
-            
+                                 
             for n = bedStartRing : bedEndRing % nring_wogap 
                 
                 fprintf('processing ring without gap   #%d ...\n', n);
@@ -855,7 +822,6 @@ classdef PETsystem
                     end
                     %lm0 = lmdata(:, idx2);  %saves every column of lmdata with matching unit difference and saves it to lm0.
 
-
                     linearInd_1 = sub2ind(size(cryseff_wgap), uint32(lm0(2,:)+1), uint32(lm0(1,:)+1) );
                     lm_cryseff_wgap_1 = cryseff_wgap(linearInd_1);
                     linearInd_2 = sub2ind(size(cryseff_wgap), uint32(lm0(4,:)+1), uint32(lm0(3,:)+1) );
@@ -863,46 +829,43 @@ classdef PETsystem
                     linearInd_3 = sub2ind(size(plaeff_wgap), uint32(lm0(2,:)+1), uint32(lm0(4,:)+1) );
                     lm_plaeff_wgap = plaeff_wgap(linearInd_3); 
 
-
                     lm_nrm = double(lm_cryseff_wgap_1) .* double(lm_cryseff_wgap_2) .* double(lm_plaeff_wgap);
-
 
                     clear  noblockring1  noblockring2   noblcokringdifference  ringdifference ...
                           linearInd   linearInd2 index_angular_bin   index_angular_rebin ...
                           index_radial_no   index_angular_no    index_axial_xp_no   index_blrgdiff_no
-                                      
 
                     prjs_att = fproj_mt(att_image, att_image_size, att_voxel_size, tc, to, lm0);
                     
+                    % remove this later!    <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <==
+               %     min(prjs_att)
+                %    max(prjs_att)
+                 %   mean(prjs_att)
+                  %  min(exp(-prjs_att))
+                   % max(exp(-prjs_att))
+                    %mean(exp(-prjs_att))
+                    negative_LOR_fraction = numel(find(prjs_att < 0.0))/numel(prjs_att);
+                    fprintf('fraction of LORs with negative attenuation: %0.2f (ring %d)\n', negative_LOR_fraction, n);
+
+                    % until here            <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <== <==
+
                     t = size(prjs_att);
 
-                    
                     ratio_MC_Ana = reshape(lm_nrm, t(1), t(2));
-                    
 
                     clear lm_nrm
                     
                     s0 = obj.doListModeBackProjectionNonTOF( double(ratio_MC_Ana) .* exp(-prjs_att), image_size, voxel_size, lm0);
-
                     
                     senimg = senimg + s0;
-                    
-                    
-                    clear lm_nrm  prjs_att  ratio_MC_Ana  lm0 s0
-                                  
+                                        
+                    clear lm_nrm  prjs_att  ratio_MC_Ana  lm0 s0                                 
                     
                 %end
-
         %}   
             end% for loop
 
             senimg = reshape(senimg, image_size);
-
-
-
-
-            
-
 
             %whos
         end

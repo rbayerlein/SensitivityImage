@@ -1,4 +1,4 @@
-function plane_eff = get_plaeff(nc_path, num_beds, first_bed_ring, rings_per_bed, overlap);
+function plane_eff = get_plaeff(nc_path, num_beds, first_bed_ring, rings_per_bed, overlap)
 
 num_crys_ax = 672; 
 last_ring = first_bed_ring+rings_per_bed+(num_beds-1)*(rings_per_bed-overlap) -1
