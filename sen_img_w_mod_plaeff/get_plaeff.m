@@ -1,14 +1,16 @@
 function plane_eff = get_plaeff(nc_path, num_beds, first_bed_ring, rings_per_bed, overlap)
 
+use_plane_eff_scaling = false;
+
 num_crys_ax = 672; 
 last_ring = first_bed_ring+rings_per_bed+(num_beds-1)*(rings_per_bed-overlap) -1
 if last_ring > num_crys_ax
-    disp('Number of beds exceeds total length of EXPLORER field of view. Abort.')
+    disp('Number of beds exceeds total length of EXPLORER field of view. Abort.');
     return;
 end
 
 if (overlap < 0 || overlap > rings_per_bed-1)
-    disp('Bed overlap is not valid. Abort.')
+    disp('Bed overlap is not valid. Abort.');
     return;
 end
 
@@ -18,7 +20,7 @@ if fid_mich < 0
 	disp('Could not open michelogram LUT...'); 
 	fid_mich = fopen('michel_lut_672x672'); 
 	if fid_mich < 0
- 		disp('Could not open michelogram LUTddd, quit');
+ 		disp('Could not open michelogram LUT, quit');
 		return;
 	end
 end
@@ -99,14 +101,16 @@ ss = ['average of MODIFIED inverted plane efficiency map: ', num2str(average_mod
 disp(ss);
 
 %% Calculate and apply scaling factor
-scaling_factor = average/average_mod;
-ss = ['scaling factor: ', num2str(scaling_factor)];
-disp(ss);
+if use_plane_eff_scaling
+    scaling_factor = average/average_mod;
+    ss = ['scaling factor: ', num2str(scaling_factor)];
+    disp(ss);
 
-for i = 1:num_crys_ax
-    for j = 1:num_crys_ax
-        if plane_eff_temp(i,j) < 10e30 && plane_eff_temp(i,j) ~=0 && plane_eff_temp(i,j) ~=1
-            plane_eff_temp(i,j) = plane_eff_temp(i,j)*scaling_factor;
+    for i = 1:num_crys_ax
+        for j = 1:num_crys_ax
+            if plane_eff_temp(i,j) < 10e30 && plane_eff_temp(i,j) ~=0 && plane_eff_temp(i,j) ~=1
+                plane_eff_temp(i,j) = plane_eff_temp(i,j)*scaling_factor;
+            end
         end
     end
 end

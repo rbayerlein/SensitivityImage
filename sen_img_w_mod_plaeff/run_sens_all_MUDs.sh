@@ -4,13 +4,13 @@
 
 num_beds=6
 rings_per_bed=78
-bedStartRing=192
+bedStartRing=188
 overlap=34	# in number of rings
 MUD_max=4
 
 # calculate MUD_max
 if [[ $rings_per_bed -lt 86 ]]; then
-	echo "bed positions could span over no more than 2 units -> MUD_max = 1"
+	echo "bed positions could span over 2 units -> MUD_max = 1"
 	MUD_max=1
 elif [[ $rings_per_bed -gt 85 ]] && [[ $rings_per_bed -lt 170 ]]; then
 	echo "bed positions could span over 3 units -> MUD_max = 2"
@@ -19,21 +19,21 @@ elif [[ $rings_per_bed -gt 169 ]] && [[ $rings_per_bed -lt 254 ]]; then
 	echo "bed positions could span over 4 units -> MUD_max = 3"
 	MUD_max=3
 else
-	echo "bed positions could span over 4 units -> MUD_max = 4"
+	echo "bed positions could span over more than 4 units -> MUD_max = 4"
 	MUD_max=4
 fi
 
 ###########################
 
 #norm coeff:
-NC=\'/media/rbayerlein/SSD_09_Reimund/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/PET/RawData/1.2.156.112605.159303471608576.210827224523.9.6628.91186/1.2.156.112605.159303471608576.210827225240.9.12756.14170.1.nc\'
+NC=\'/mnt/Bigbang/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/PET/RawData/1.2.156.112605.159303471608576.210827224523.9.6628.91186/1.2.156.112605.159303471608576.210827225240.9.12756.14170.1.nc\'
 
 #output RAW file name of the final combined sensitivity image
-P1=\'/media/rbayerlein/data/recon_data/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/sen_img/CTAC_201.sen_img\'		#output RAW file name of the final combined sensitivity image
+P1=\'/media/rbayerlein/data/recon_data/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/sen_img/CTAC_201_20230310.sen_img\'		#output RAW file name of the final combined sensitivity image
 #P1=\'/home/rbayerlein/Code/Recon/senimg/dir_temp/CTAC_120_MIN_201.sen_img\'
 
 # Path to CT image 
-P2=\'/media/rbayerlein/SSD_09_Reimund/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/Image/CTAC_201\'
+P2=\'/media/rbayerlein/data/recon_data/20210827/Multi-Bed_Phantom_Multi-Bed_Phantom_154523/sen_img/CTAC_201\'
 	
 # alternative: give path to mu map; if exists: set boolean 'mu_map_exists' to 1
 #P2=\'/media/rbayerlein/data/recon_data/20210714/NERVO_ATILLIO_7696939_144717_Raw/sen_img/CTAC_120_MIN_201_mumap_kVp-140_size-256x256x828_vox-2.7344x2.7344x2.344.img\'

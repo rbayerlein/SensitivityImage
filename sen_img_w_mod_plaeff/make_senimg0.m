@@ -2,7 +2,7 @@ function make_senimg0(nc_file, senimg_name, att_image_path, first_bed_ring, num_
 
 %=======================================================================
 % ONLY FOR SIMULATION !!
-is_simulation=true;
+is_simulation=false;
 %=======================================================================
 
     
